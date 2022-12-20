@@ -24,7 +24,7 @@ class Rule(TestPlatform):
                             }
 
     def query(self, keyWord=None, tableField='*'):
-        tableField = self.tableFields.keys()
+        tableField = self.tableFields.keys() if tableField == '*' else tableField
         logger.debug(keyWord)
         if keyWord:
             keyWordList = []
@@ -39,12 +39,19 @@ class Rule(TestPlatform):
             sql = f"select {','.join(tableField)} from rule;"
         logger.debug(sql)
         self.cursor.execute(sql)
+
+        data = []
         for line in self.cursor.fetchall():
-            print(line)
+            lineData = {}
+            for field in range(len(line)):
+                print(line(field))
+                # lineData[tableField[field]] = line(field)
+            data.append(lineData)
+        print(data)
 
 
 if __name__ == '__main__':
 
     rule = Rule()
     rule.query({'id':1,'ruleName':"微众身份证影印件合规规则"})
-    rule.query()
+    rule.query(tableField=['ruleName'])
