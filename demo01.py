@@ -83,30 +83,46 @@ class TestPlatform:
         logger.debug(f'SQL：{sql}')
         self.cursor.execute(sql)
         self.db.commit()
+
+        # 获取最新的一条数据
+        sql = f'SELECT * FROM {tableName} ORDER BY id DESC LIMIT 1;'
+        self.cursor.execute(sql)
         for line in self.cursor.fetchall():
-            print('line:', line)
+            return line
 
     @logger.catch
-    @logging("批量添加数据")
-    def addBatch(self, tableName, dataList):
+    @logging("修改一条数据")
+    def change(self, tableName, targetData, changeData):
         """
-
+        修改数据
         :param tableName: 表名
-        :param dataList:列表嵌套字典 [{'id': 1, 'ruleName': '微众身份证影印件合规规则'}]
+        :param targetData: 字典：用于确定要修改哪条数据 {'id': 1, 'version': 1}
+        :param changeData: 字典：修改数据 {'ruleName': '微众身份证影印件合规规则', 'rulePremiseId': 0}
         :return:
         """
-        # 查询 默认值，补全空字段
+        # {'code': 0, 'message': 'success', 'data': []}
+        # {'code': -1, 'message': 'failure'}
 
-        defaultValueList = []
-        for data in dataList:
-            defaultValue = [data[key] for key in data.keys()]
-            defaultValueList.append(defaultValue)
-        print(defaultValueList)
+        changeData['version'] = targetData['version'] + 1
+        targetDataList = [f'{key}="{targetData[key]}"' if isinstance(targetData[key], str) else f'{key}={targetData[key]}' for
+                       key in targetData.keys()]
+        changeDataList = [f'{key}="{changeData[key]}"' if isinstance(changeData[key], str) else f'{key}={changeData[key]}' for
+                       key in changeData.keys()]
+        getSql = f"select * from {tableName} where {' and '.join(targetDataList)};"
+        self.cursor.execute(getSql)
+        if len([line for line in self.cursor.fetchall()]) != 1:
+            return {'code': -1, 'message': '未查询到要修改的数据'}
 
-        # INSERT INTO table_name  (field1, field2,...fieldN)  VALUES  (valueA1,valueA2,...valueAN),(valueB1,valueB2,...valueBN),(valueC1,valueC2,...valueCN)......;
+        sql = f"UPDATE {tableName} SET {','.join(changeDataList)} WHERE {' and '.join(targetDataList)};"
+        logger.debug(f'SQL：{sql}')
+        self.cursor.execute(sql)
+        self.db.commit()
 
+        getSql = f"select * from {tableName} where id={targetData['id']};"
+        self.cursor.execute(getSql)
+        for line in self.cursor.fetchall():
+            return {'code': 0, 'message': 'success', 'data': line}
 
-        pass
 
 
 class Rule(TestPlatform):
@@ -128,20 +144,28 @@ class Rule(TestPlatform):
         tableField = [item for item in self.tableFields] if tableField == '*' else tableField
         return self.query(tableName=self.tableName, tableField=tableField, keyWord=keyWord)
 
-    @logging("添加一个rule数据")
+    @logging("添加一条rule数据")
     def add_rule(self, data):
         return self.addOnce(self.tableName, data)
 
-    @logging("批量添加rule数据")
-    def adds_rule(self, dataList):
-        return self.addBatch(self.tableName, dataList)
+    @logging("修改一条rule数据")
+    def change_rule(self, targetData, changeData):
+        """
+
+        :param targetData: 字典：用于确定要修改哪条数据 {'id': 1, 'version': 1}
+        :param changeData: 字典：修改数据 {'ruleName': '微众身份证影印件合规规则', 'rulePremiseId': 0}
+        :return:
+        """
+        # {'code': 0, 'message': 'success', 'data': []}
+        # {'code': -1, 'message': 'failure'}
+        return self.change(self.tableName, targetData, changeData)
 
 
 if __name__ == '__main__':
 
     rule = Rule()
-    # print(rule.query_rule({'ruleName': '微众身份证影印件合规规则'}))
+    # print(rule.query_rule({'ruleName': '游戏规则'}))
     # print(rule.query_rule())
-    # print(rule.add_rule({'ruleName': '测试规则'}))
-    dataList = [{'ruleName': '微众身份证影印件合规规则'}, {'ruleName': '零钱提额用户的二类卡日剩余额度规则',}]
-    rule.adds_rule(dataList)
+    # print(rule.add_rule({'ruleName': '游戏规则'}))
+    print(rule.change_rule({'id': 1, 'version': 3},{'ruleName': '游戏规则12123'}))
+
