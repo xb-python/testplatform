@@ -4,7 +4,9 @@ from loguru import logger
 
 
 def logging(funcDesc=None):  # 用于装饰的函数名
+
     def outwrapper(func):  # 接收 用于调用的函数名
+
         def wrapper(*args, **kwargs):  # 接收 传递到调用函数的参数
             logger.info(f"{funcDesc},调用:{func.__name__}()")
             logger.info(f"请求参数 {func.__name__}(): {args,kwargs}")
@@ -19,9 +21,11 @@ def logging(funcDesc=None):  # 用于装饰的函数名
 
 class TestPlatform:
 
+
     def __init__(self):
         self.db = pymysql.connect(host=HOST,port=PORT,user=USER,password=PASSWORD,database='test_platform',charset='utf8')
         self.cursor = self.db.cursor()
+
 
     @logger.catch
     @logging("获取所有字段名及默认值")
@@ -32,7 +36,7 @@ class TestPlatform:
         :return:
         """
         # 查询 默认
-        sql = f"select COLUMN_NAME,COLUMN_TYPE  from information_schema.COLUMNS where table_name = '{tableName}';"
+        sql = f"DESCRIBE {tableName};"
         self.cursor.execute(sql)
         fieldsdefaultValue = {}     # 存储 默认值
         for line in self.cursor.fetchall():
@@ -40,6 +44,7 @@ class TestPlatform:
                 continue
             fieldsdefaultValue[line[0]] = None if 'varchar' in line[1] else 0
         return fieldsdefaultValue
+
 
     @logger.catch
     @logging("查询数据")
@@ -68,6 +73,7 @@ class TestPlatform:
             dataList.append(lineData)
         return dataList
 
+
     @logger.catch
     @logging("单挑添加数据")
     def addOnce(self, tableName, data):
@@ -89,6 +95,7 @@ class TestPlatform:
         self.cursor.execute(sql)
         for line in self.cursor.fetchall():
             return line
+
 
     @logger.catch
     @logging("修改一条数据")
@@ -123,49 +130,12 @@ class TestPlatform:
         for line in self.cursor.fetchall():
             return {'code': 0, 'message': 'success', 'data': line}
 
-
-
-class Rule(TestPlatform):
-
-    def __init__(self):
-        super(Rule, self).__init__()
-        self.tableName = 'rule'
-        self.tableFields = {
-                                'id': 'int',
-                                'ruleName': 'str',
-                                'rulePremiseId': 'int',
-                                'details': 'str',
-                                'eliminate': 'int',
-                                'version': 'int'
-                            }
-
-    @logging("查询rule数据")
-    def query_rule(self, keyWord=None, tableField='*'):
-        tableField = [item for item in self.tableFields] if tableField == '*' else tableField
-        return self.query(tableName=self.tableName, tableField=tableField, keyWord=keyWord)
-
-    @logging("添加一条rule数据")
-    def add_rule(self, data):
-        return self.addOnce(self.tableName, data)
-
-    @logging("修改一条rule数据")
-    def change_rule(self, targetData, changeData):
-        """
-
-        :param targetData: 字典：用于确定要修改哪条数据 {'id': 1, 'version': 1}
-        :param changeData: 字典：修改数据 {'ruleName': '微众身份证影印件合规规则', 'rulePremiseId': 0}
-        :return:
-        """
-        # {'code': 0, 'message': 'success', 'data': []}
-        # {'code': -1, 'message': 'failure'}
-        return self.change(self.tableName, targetData, changeData)
-
-
 if __name__ == '__main__':
+    import os
 
-    rule = Rule()
-    # print(rule.query_rule({'ruleName': '游戏规则'}))
-    # print(rule.query_rule())
-    # print(rule.add_rule({'ruleName': '游戏规则'}))
-    print(rule.change_rule({'id': 1, 'version': 3},{'ruleName': '游戏规则12123'}))
-
+    path01 = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    path02 = 'log'
+    path03 = os.path.join(path01, path02)
+    print(path01)
+    print(path02)
+    print(path03)
