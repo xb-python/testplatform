@@ -18,7 +18,7 @@
             },
             {
               "name": "CREATED_BY",
-              "type": "IdOrKey",
+              "type": "DefaultString",
               "remark": "",
               "chnname": "步骤号",
               "notNull": false,
@@ -26,7 +26,7 @@
             },
             {
               "name": "CREATED_TIME",
-              "type": "DefaultString",
+              "type": "ShortString",
               "remark": "",
               "chnname": "步骤名称",
               "defaultValue": "None"
@@ -135,13 +135,6 @@
               "defaultValue": ""
             },
             {
-              "name": "CREATED_TIME",
-              "type": "Integer",
-              "remark": "",
-              "chnname": "前提规则id",
-              "defaultValue": "0"
-            },
-            {
               "name": "UPDATED_BY",
               "type": "DefaultString",
               "remark": "",
@@ -213,7 +206,7 @@
           "chnname": "rule规则表"
         },
         {
-          "title": "处理方式表",
+          "title": "handle处理方式表",
           "fields": [
             {
               "name": "REVISION",
@@ -232,13 +225,13 @@
             },
             {
               "name": "CREATED_TIME",
-              "type": "DefaultString",
+              "type": "ShortString",
               "remark": "",
               "chnname": "处理方式"
             },
             {
               "name": "UPDATED_BY",
-              "type": "DefaultString",
+              "type": "ShortString",
               "remark": "",
               "chnname": "描述"
             },
@@ -303,10 +296,11 @@
               "fieldName": "uiHint",
               "relationNoShow": true
             }
-          ]
+          ],
+          "chnname": "handle处理方式表"
         },
         {
-          "title": "检查点表",
+          "title": "condition条件表",
           "fields": [
             {
               "name": "REVISION",
@@ -325,7 +319,7 @@
             },
             {
               "name": "CREATED_TIME",
-              "type": "DefaultString",
+              "type": "ShortString",
               "remark": "",
               "chnname": "检查点"
             },
@@ -337,7 +331,7 @@
             },
             {
               "name": "UPDATED_TIME",
-              "type": "DefaultString",
+              "type": "ShortString",
               "remark": "",
               "chnname": "描述"
             },
@@ -402,7 +396,8 @@
               "fieldName": "uiHint",
               "relationNoShow": true
             }
-          ]
+          ],
+          "chnname": "condition条件表"
         },
         {
           "title": "测试用例表",
@@ -436,6 +431,53 @@
               "type": "DateTime",
               "remark": "",
               "chnname": "更新时间"
+            }
+          ],
+          "indexs": [],
+          "headers": [
+            {
+              "fieldName": "chnname",
+              "relationNoShow": false
+            },
+            {
+              "fieldName": "name",
+              "relationNoShow": false
+            },
+            {
+              "fieldName": "type",
+              "relationNoShow": false
+            },
+            {
+              "fieldName": "dataType",
+              "relationNoShow": true
+            },
+            {
+              "fieldName": "remark",
+              "relationNoShow": true
+            },
+            {
+              "fieldName": "pk",
+              "relationNoShow": false
+            },
+            {
+              "fieldName": "notNull",
+              "relationNoShow": true
+            },
+            {
+              "fieldName": "autoIncrement",
+              "relationNoShow": true
+            },
+            {
+              "fieldName": "defaultValue",
+              "relationNoShow": true
+            },
+            {
+              "fieldName": "relationNoShow",
+              "relationNoShow": true
+            },
+            {
+              "fieldName": "uiHint",
+              "relationNoShow": true
             }
           ]
         },
@@ -714,7 +756,7 @@
           },
           {
             "shape": "table",
-            "title": "处理方式表",
+            "title": "handle处理方式表",
             "moduleName": false,
             "x": 1410,
             "y": 140,
@@ -726,7 +768,7 @@
           },
           {
             "shape": "table",
-            "title": "检查点表",
+            "title": "condition条件表",
             "moduleName": false,
             "x": 1960,
             "y": 90,
@@ -751,7 +793,7 @@
               },
               {
                 "x": 584.3922308583475,
-                "y": 84.683220614449
+                "y": 88.98630149812735
               }
             ],
             "sourceAnchor": 7,
@@ -766,7 +808,7 @@
             "controlPoints": [
               {
                 "x": 1015.6077691416525,
-                "y": 84.683220614449
+                "y": 88.98630149812735
               },
               {
                 "x": 1185.3762912181128,
@@ -820,18 +862,18 @@
             "field": "REVISION"
           },
           "to": {
-            "entity": "处理方式表",
+            "entity": "handle处理方式表",
             "field": "CREATED_BY"
           }
         },
         {
           "relation": "1:1,n",
           "from": {
-            "entity": "处理方式表",
+            "entity": "handle处理方式表",
             "field": "REVISION"
           },
           "to": {
-            "entity": "检查点表",
+            "entity": "condition条件表",
             "field": "CREATED_BY"
           }
         }
